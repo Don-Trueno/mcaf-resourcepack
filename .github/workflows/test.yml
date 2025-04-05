@@ -9,6 +9,7 @@ on:
 
 jobs:
   build:
+    if: github.respository = 'Don-Trueno/mcaf-resourcepack'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
