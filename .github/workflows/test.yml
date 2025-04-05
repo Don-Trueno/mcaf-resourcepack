@@ -19,7 +19,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
     outputs:
-      release_id:
+      output1: ${{ steps.create_release.outputs.id }}
 
     steps:
       - name: Checkout Repository
