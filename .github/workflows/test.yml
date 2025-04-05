@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    if: github.respository = 'Don-Trueno/mcaf-resourcepack'
+    if: github.respository == 'Don-Trueno/mcaf-resourcepack'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -22,16 +22,14 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          branches:
 
-      - name: Pack ${{ matrix.pack-version }}
-        run: |
-          cd resources/${{ matrix.pack-version }}
-          zip -r ../../${{ matrix.pack-version }}.zip ./*
+      # - name: Pack ${{ matrix.pack-version }}
+      #   run: |
+      #     cd resources/${{ matrix.pack-version }}
+      #     zip -r ../../${{ matrix.pack-version }}.zip ./*
 
       - name: Upload Artifact for ${{ matrix.pack-version }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.pack-version }}
-          path: ./${{ matrix.pack-version }}.zip
+          path: ./resources/${{ matrix.pack-version }}/*
