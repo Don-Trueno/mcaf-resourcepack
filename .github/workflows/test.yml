@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.create_release.outputs.id }}
     strategy:
       # Disabling fail-fast to ensure all matrix jobs run, even if one fails.
       fail-fast: false
@@ -22,22 +24,19 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+
       - name: Package Resources for ${{ matrix.pack-version }}
-      - name: Pack ${{ matrix.pack-version }}
         run: |
-          if [ -d "resources/${{ matrix.pack-version }}" ]; then
-            cd resources/${{ matrix.pack-version }}
-          else
-            echo "Directory resources/${{ matrix.pack-version }} does not exist."
-            exit 1
-          fi
-          file: ${{ matrix.pack-version }}.zip
+          cd resources/${{ matrix.pack-version }}
+          zip -r ../../${{ matrix.pack-version }}.zip ./*
 
       # This step uploads the generated zip file as a release asset to the GitHub release.
       - name: Upload Packaged Release for ${{ matrix.pack-version }}
         uses: xresloader/upload-to-github-release@v1
         with:
           file: '${{ matrix.pack-version }}.zip'
+          release_name: Test
+          body: |
+            Test upload-to-github-release works with `actions/create-release`.
           overwrite: true
-        run: |
-          cat "output_${version}=${version}"
