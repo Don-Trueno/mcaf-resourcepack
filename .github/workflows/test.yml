@@ -11,8 +11,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        fail-fast: false
+      fail-fast: false
+      matrix:        
         pack-version: ["23w13a_or_b", "24w14potato", "25w14craftmine"]
 
     env:
