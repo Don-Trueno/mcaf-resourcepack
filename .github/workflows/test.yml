@@ -1,0 +1,36 @@
+name: Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - dev
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        fail-fast: false
+        pack-version: ["23w13a_or_b", "24w14potato", "25w14craftmine"]
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          branches:
+
+      - name: Pack ${{ matrix.pack-version }}
+        run: |
+          cd resources/${{ matrix.pack-version }}
+          zip -r ../../${{ matrix.pack-version }}.zip ./*
+
+      - name: Upload Artifact for ${{ matrix.pack-version }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.pack-version }}
+          path: ./${{ matrix.pack-version }}.zip
