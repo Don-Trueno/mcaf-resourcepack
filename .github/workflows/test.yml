@@ -8,22 +8,6 @@ on:
 
 
 jobs:
-  get-latest-pr:
-    runs-on: ubuntu-latest
-
-    steps:
-      # 检出代码
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      # 使用 GitHub CLI 获取最新的 PR
-      - name: Get Latest Pull Request
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PR_INFO=$(gh pr list --limit 1 --json number,title,author --jq '.[] | "PR #\(.number): \(.title) by \(.author.login)"')
-          echo "LATEST_PR=$PR_INFO" >> $GITHUB_ENV
-
   build:
     runs-on: ubuntu-latest
     strategy:
@@ -34,17 +18,23 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
+    outputs:
+      release_id:
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Upload Artifact for ${{ matrix.pack-version }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.pack-version }}
-          path: ./resources/${{ matrix.pack-version }}/*
-
-      # 使用环境变量中的最新 PR 信息
-      - name: Print Latest PR
+      - name: Pack ${{ matrix.pack-version }}
         run: |
-          echo "The latest PR is: $LATEST_PR"
+          cd resources/${{ matrix.pack-version }}
+          zip -r ../../${{ matrix.pack-version }}.zip ./*
+
+      - name: Upload Release for ${{ matrix.pack-version }}
+        uses: xresloader/upload-to-github-release@v1
+        with:
+          file: '*.zip'
+          overwrite: true
+
+          
+          
