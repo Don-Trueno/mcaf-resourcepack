@@ -11,6 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      # Disabling fail-fast to ensure all matrix jobs run, even if one fails.
       fail-fast: false
       matrix:        
         pack-version: ["23w13a_or_b", "24w14potato", "25w14craftmine"]
@@ -18,23 +19,25 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
-    outputs:
-      output1: ${{ steps.create_release.outputs.id }}
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
+      - name: Package Resources for ${{ matrix.pack-version }}
       - name: Pack ${{ matrix.pack-version }}
         run: |
-          cd resources/${{ matrix.pack-version }}
-          zip -r ../../${{ matrix.pack-version }}.zip ./*
+          if [ -d "resources/${{ matrix.pack-version }}" ]; then
+            cd resources/${{ matrix.pack-version }}
+          else
+            echo "Directory resources/${{ matrix.pack-version }} does not exist."
+            exit 1
+          fi
+          file: ${{ matrix.pack-version }}.zip
 
-      - name: Upload Release for ${{ matrix.pack-version }}
+      # This step uploads the generated zip file as a release asset to the GitHub release.
+      - name: Upload Packaged Release for ${{ matrix.pack-version }}
         uses: xresloader/upload-to-github-release@v1
         with:
-          file: '*.zip'
+          file: '${{ matrix.pack-version }}.zip'
           overwrite: true
-
-          
-          
+        run: |
+          cat "output_${version}=${version}"
